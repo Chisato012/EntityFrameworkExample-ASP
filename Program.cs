@@ -6,18 +6,16 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 builder.Services.AddControllersWithViews();
 
-var connectionString = builder.Configuration.GetConnectionString("BookManagement")
-    ?? throw new InvalidOperationException("Connection string 'BookManagement' not found.");
+var connectionString = builder.Configuration.GetConnectionString("RoomManagement")
+    ?? throw new InvalidOperationException("Connection string 'RoomManagement' not found.");
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(connectionString));
-builder.Services.AddScoped<BookRepository>();
+builder.Services.AddScoped<RoomRepository>();
 
 var app = builder.Build();
 
-// Tạo database BookManagement và bảng Book nếu chưa tồn tại
 using (var scope = app.Services.CreateScope())
 {
     try
@@ -28,15 +26,13 @@ using (var scope = app.Services.CreateScope())
     catch (Exception ex)
     {
         var logger = scope.ServiceProvider.GetRequiredService<ILoggerFactory>().CreateLogger("DbInitializer");
-        logger.LogError(ex, "Không thể kết nối hoặc khởi tạo database. Kiểm tra SQL LocalDB đang chạy.");
+        logger.LogError(ex, "Cannot connect to or initialize the database. Check that SQL LocalDB is running.");
     }
 }
 
-// Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
     app.UseHttpsRedirection();
 }
@@ -61,8 +57,8 @@ try
 catch (IOException ex) when (ex.InnerException is AddressInUseException or SocketException)
 {
     Console.ForegroundColor = ConsoleColor.Red;
-    Console.WriteLine("Không thể khởi động web: cổng localhost đang được sử dụng.");
-    Console.WriteLine("Dừng instance cũ (Ctrl+C) hoặc đóng terminal đang chạy ứng dụng, rồi chạy lại dotnet run.");
+    Console.WriteLine("Cannot start the web app: the localhost port is already in use.");
+    Console.WriteLine("Stop the old instance or close the terminal that is running the app, then run dotnet run again.");
     Console.ResetColor();
     throw;
 }

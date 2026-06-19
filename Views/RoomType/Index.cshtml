@@ -1,0 +1,45 @@
+@model IEnumerable<RoomType_BIT242520>
+@{
+    ViewData["Title"] = "Room types BIT242520";
+}
+
+<h1>Room types BIT242520</h1>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+}
+
+<p>
+    <a asp-action="Create" class="btn btn-success">Create room type</a>
+    <a asp-controller="Room" asp-action="Index" class="btn btn-outline-secondary">Rooms</a>
+</p>
+
+<table class="table table-bordered table-striped align-middle">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Name</th>
+            <th>Description</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var roomType in Model)
+        {
+            <tr>
+                <td>@roomType.Id</td>
+                <td>@roomType.Name</td>
+                <td>@roomType.Description</td>
+                <td class="text-nowrap">
+                    <a asp-action="Edit" asp-route-id="@roomType.Id">Edit</a> |
+                    <a asp-action="Delete" asp-route-id="@roomType.Id">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

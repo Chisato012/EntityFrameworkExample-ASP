@@ -1,0 +1,117 @@
+@model IEnumerable<Room_BIT242520>
+@{
+    ViewData["Title"] = "Rooms BIT242520";
+    bool? selectedAvailability = ViewBag.SelectedIsAvailable;
+    string? sortOrder = ViewBag.SortOrder as string;
+}
+
+<h1>Room management BIT242520</h1>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+}
+
+<form asp-action="Index" method="get" class="row g-3 align-items-end mb-4">
+    <div class="col-md-3">
+        <label class="form-label" for="keyword">Search room name</label>
+        <input id="keyword" name="keyword" value="@ViewBag.Keyword" class="form-control" />
+    </div>
+    <div class="col-md-2">
+        <label class="form-label" for="roomTypeId">Room type</label>
+        <select id="roomTypeId" name="roomTypeId" class="form-select" asp-items="ViewBag.RoomTypes">
+            <option value="">All</option>
+        </select>
+    </div>
+    <div class="col-md-2">
+        <label class="form-label" for="isAvailable">Availability</label>
+        <select id="isAvailable" name="isAvailable" class="form-select">
+            <option value="">All</option>
+            <option value="true" selected="@(selectedAvailability == true)">Available</option>
+            <option value="false" selected="@(selectedAvailability == false)">Unavailable</option>
+        </select>
+    </div>
+    <div class="col-md-2">
+        <label class="form-label" for="maxPrice">Max price</label>
+        <input id="maxPrice" name="maxPrice" value="@ViewBag.MaxPrice" type="number" min="0" step="10000" class="form-control" />
+    </div>
+    <div class="col-md-2">
+        <label class="form-label" for="sortOrder">Sort</label>
+        <select id="sortOrder" name="sortOrder" class="form-select">
+            <option value="" selected="@(string.IsNullOrEmpty(sortOrder))">Default</option>
+            <option value="price_asc" selected="@(sortOrder == "price_asc")">Price ascending</option>
+            <option value="price_desc" selected="@(sortOrder == "price_desc")">Price descending</option>
+            <option value="area_desc" selected="@(sortOrder == "area_desc")">Area descending</option>
+        </select>
+    </div>
+    <div class="col-md-1 d-grid">
+        <button type="submit" class="btn btn-primary">Find</button>
+    </div>
+</form>
+
+<p>
+    <a asp-action="Create" class="btn btn-success">Create room</a>
+    <a asp-controller="RoomType" asp-action="Index" class="btn btn-outline-secondary">Room types</a>
+</p>
+
+@if (ViewBag.EmptyMessage != null)
+{
+    <div class="alert alert-warning">@ViewBag.EmptyMessage</div>
+}
+
+<table class="table table-bordered table-striped align-middle">
+    <thead>
+        <tr>
+            <th>Image</th>
+            <th>Name</th>
+            <th>Room type</th>
+            <th class="text-end">Price</th>
+            <th class="text-end">Area</th>
+            <th class="text-end">Price / m2</th>
+            <th>Status</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var room in Model)
+        {
+            var thumbnail = room.RoomImages.FirstOrDefault(i => i.IsThumbnail) ?? room.RoomImages.FirstOrDefault();
+            <tr>
+                <td style="width: 120px">
+                    @if (thumbnail != null)
+                    {
+                        <img src="@thumbnail.ImageUrl" alt="@room.Name" class="img-thumbnail room-thumb" />
+                    }
+                    else
+                    {
+                        <span class="text-muted">No image</span>
+                    }
+                </td>
+                <td>@room.Name</td>
+                <td>@room.RoomType?.Name</td>
+                <td class="text-end">@room.Price.ToString("N0")</td>
+                <td class="text-end">@room.Area.ToString("N2") m2</td>
+                <td class="text-end">@((room.Price / room.Area).ToString("N0"))</td>
+                <td>
+                    @if (room.IsAvailable)
+                    {
+                        <span class="badge bg-success">Available</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-secondary">Unavailable</span>
+                    }
+                </td>
+                <td class="text-nowrap">
+                    <a asp-action="Detail" asp-route-id="@room.Id">Detail</a> |
+                    <a asp-action="Edit" asp-route-id="@room.Id">Edit</a> |
+                    <a asp-action="Delete" asp-route-id="@room.Id">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -1,0 +1,93 @@
+@model Room_BIT242520
+@{
+    ViewData["Title"] = "Room detail";
+}
+
+<h1>@Model.Name</h1>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+}
+
+<dl class="row">
+    <dt class="col-sm-3">Id</dt>
+    <dd class="col-sm-9">@Model.Id</dd>
+
+    <dt class="col-sm-3">Room type</dt>
+    <dd class="col-sm-9">@Model.RoomType?.Name</dd>
+
+    <dt class="col-sm-3">Price</dt>
+    <dd class="col-sm-9">@Model.Price.ToString("N0")</dd>
+
+    <dt class="col-sm-3">Area</dt>
+    <dd class="col-sm-9">@Model.Area.ToString("N2") m2</dd>
+
+    <dt class="col-sm-3">Price / m2</dt>
+    <dd class="col-sm-9">@((Model.Price / Model.Area).ToString("N0"))</dd>
+
+    <dt class="col-sm-3">Status</dt>
+    <dd class="col-sm-9">@(Model.IsAvailable ? "Available" : "Unavailable")</dd>
+
+    <dt class="col-sm-3">Description</dt>
+    <dd class="col-sm-9">@Model.Description</dd>
+</dl>
+
+<h2 class="h4 mt-4">Room images</h2>
+
+@if (!Model.RoomImages.Any())
+{
+    <div class="alert alert-warning">This room has no images.</div>
+}
+else
+{
+    <div class="row g-3 mb-4">
+        @foreach (var image in Model.RoomImages)
+        {
+            <div class="col-sm-6 col-md-4">
+                <div class="border rounded p-2 h-100">
+                    <img src="@image.ImageUrl" alt="@Model.Name" class="img-fluid room-detail-image mb-2" />
+                    <div class="small text-break">@image.ImageUrl</div>
+                    @if (image.IsThumbnail)
+                    {
+                        <span class="badge bg-primary">Thumbnail</span>
+                    }
+                    else
+                    {
+                        <form asp-action="SetThumbnail" method="post" class="mt-2">
+                            <input type="hidden" name="roomId" value="@Model.Id" />
+                            <input type="hidden" name="imageId" value="@image.Id" />
+                            <button type="submit" class="btn btn-sm btn-outline-primary">Set thumbnail</button>
+                        </form>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+}
+
+<h2 class="h4">Add image by URL</h2>
+<form asp-action="AddImage" method="post" class="row g-3 align-items-end mb-4">
+    <input type="hidden" name="roomId" value="@Model.Id" />
+    <div class="col-md-8">
+        <label class="form-label" for="imageUrl">Image URL</label>
+        <input id="imageUrl" name="imageUrl" class="form-control" placeholder="/images/rooms/new-main.jpg" />
+    </div>
+    <div class="col-md-2">
+        <div class="form-check">
+            <input id="isThumbnail" name="isThumbnail" value="true" class="form-check-input" type="checkbox" />
+            <label class="form-check-label" for="isThumbnail">Thumbnail</label>
+        </div>
+    </div>
+    <div class="col-md-2 d-grid">
+        <button type="submit" class="btn btn-primary">Add image</button>
+    </div>
+</form>
+
+<a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">Edit</a>
+<a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger">Delete</a>
+<a asp-action="Index" class="btn btn-secondary">Back to list</a>

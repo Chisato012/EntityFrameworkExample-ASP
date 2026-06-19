@@ -1,0 +1,34 @@
+@model RoomType_BIT242520
+@{
+    ViewData["Title"] = "Delete room type";
+}
+
+<h1>Delete room type</h1>
+
+@if (Model.Rooms.Any())
+{
+    <div class="alert alert-warning">
+        This room type is being used by @Model.Rooms.Count room(s), so it cannot be deleted.
+    </div>
+}
+else
+{
+    <div class="alert alert-danger">Are you sure you want to delete this room type?</div>
+}
+
+<dl class="row">
+    <dt class="col-sm-3">Id</dt>
+    <dd class="col-sm-9">@Model.Id</dd>
+
+    <dt class="col-sm-3">Name</dt>
+    <dd class="col-sm-9">@Model.Name</dd>
+
+    <dt class="col-sm-3">Description</dt>
+    <dd class="col-sm-9">@Model.Description</dd>
+</dl>
+
+<form asp-action="Delete" method="post">
+    <input type="hidden" asp-for="Id" />
+    <button type="submit" class="btn btn-danger" disabled="@Model.Rooms.Any()">Delete</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+</form>
